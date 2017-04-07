@@ -27,13 +27,11 @@ const int moistpwr = 3;
 const int pump = 4;
 const int fan = 5;
 const int waternow = 6;
-const int statusLED = 6;
+const int statusLED = 7;
 
 // state variables for LED
 boolean ledstate = LOW;
 unsigned long prevLEDmillis = 0;
-
-
 
 int checkinterval = 1200000;  //20 minnutes between soil moisture checks
 int sensorinterval = 300000;  //5 minutes between sun/rain/temp checks
@@ -42,7 +40,6 @@ int watertime = 90000;        //2 minutes watering time
 unsigned long prevmainMillis; //main loop state checking
 unsigned long prevsensormillis;
 unsigned long currentMillis;
-
 
 
 void setup() {
@@ -185,31 +182,12 @@ void sensors() {
   }
 
   if (analogRead(sunlight) < 300) { //sun gone down? extend watering cycle from 20 minutes to 4 hours
+    if (checksoil())
+      watering();
     checkinterval = 14400000;
-    watertime = 30000;  
+    watertime = 30000;
   } else {
     checkinterval = 1200000;
     watertime = 90000;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
