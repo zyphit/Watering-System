@@ -28,6 +28,7 @@ const int pump = 4;
 const int fan = 5;
 const int waternow = 6;
 const int statusLED = 7;
+const int waterlevel = 8;
 
 // state variables for LED
 boolean ledstate = LOW;
@@ -52,6 +53,7 @@ void setup() {
   pinMode(pump, OUTPUT);
   pinMode(fan, OUTPUT);
   pinMode(statusLED, OUTPUT);
+  pinMode(waterlevel, INPUT_PULLUP);
 
   digitalWrite(statusLED,HIGH);
   ledstate = HIGH;
@@ -142,27 +144,36 @@ void watering() {
   unsigned long start_watering = millis();
   unsigned long end_watering = start_watering + watertime;
   unsigned long wateringprogress = start_watering;
-  digitalWrite(pump, HIGH);
-  digitalWrite(statusLED, HIGH);
-  long ontime = 1000;
-  long offtime = 1000;
-  prevLEDmillis = start_watering;
-  
-  while (wateringprogress <= end_watering) { //while loop blinks status LED while watering
-    if (ledstate == HIGH && wateringprogress - prevLEDmillis >= ontime) {
-      ledstate = LOW;
-      prevLEDmillis = wateringprogress;
-      digitalWrite(statusLED,ledstate);
-    } else if (ledstate == LOW && wateringprogress - prevLEDmillis >= offtime) {
-      ledstate = HIGH;
-      prevLEDmillis = wateringprogress;
-      digitalWrite(statusLED,ledstate);
+  if (waterlevel = LOW) {
+    for (i=0; i<=100, i++){
+      digitalWrite(statusLED,LOW);
+      delay(50);
+      digitalWrite(statusLED,HIGH);
+      delay(50);
     }
-    wateringprogress = millis();
-  } //end while loop
-  digitalWrite(pump, LOW);
-  digitalWrite(statusLED, HIGH);
-  ledstate = HIGH;
+  } else {
+    digitalWrite(pump, HIGH);
+    digitalWrite(statusLED, HIGH);
+    long ontime = 1000;
+    long offtime = 1000;
+    prevLEDmillis = start_watering;
+    while (wateringprogress <= end_watering && waterlevel == HIGH) {
+      //while loop blinks status LED while watering and checks water level
+      if (ledstate == HIGH && wateringprogress - prevLEDmillis >= ontime) {
+        ledstate = LOW;
+        prevLEDmillis = wateringprogress;
+        digitalWrite(statusLED,ledstate);
+      } else if (ledstate == LOW && wateringprogress - prevLEDmillis >= offtime) {
+        ledstate = HIGH;
+        prevLEDmillis = wateringprogress;
+        digitalWrite(statusLED,ledstate);
+      }
+      wateringprogress = millis();
+    } //end while loop
+    digitalWrite(pump, LOW);
+    digitalWrite(statusLED, HIGH);
+    ledstate = HIGH;
+  }
 }
 
 // function that checks the rain/sun/temp sensors and adjusts the watering time accordingly
